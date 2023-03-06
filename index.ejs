@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>OpenAI Chatbot</title>
+</head>
+<body>
+  <h1>OpenAI Chatbot</h1>
+  
+  <form action="/ask" method="POST">
+    <label for="question">Ask a question:</label>
+    <input type="text" id="question" name="question">
+    <button type="submit">Ask</button>
+  </form>
+  
+  <h2>Conversation History</h2>
+  <ul>
+    <% for (const message of history) { %>
+      <li><%= message %></li>
+    <% } %>
+  </ul>
+  
+  <% if (answer) { %>
+    <h2>Answer</h2>
+    <p><%= answer %></p>
+  <% } %>
+</body>
+</html>
