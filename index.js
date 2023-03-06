@@ -1,18 +1,34 @@
-import generateResponse from "./lib/generateResponse.js";
-import promptSync from 'prompt-sync';
+const express = require('express');
+const generateResponse = require('./lib/generateResponse');
+const promptSync = require('prompt-sync')();
 
-const prompt = promptSync();
+const app = express();
+app.use(express.urlencoded({ extended: true }));
 
-const conversationHistory = [];
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
 
-while (true) {
-  const question = prompt("Ask a question >");
+// Route for the homepage
+app.get('/', (req, res) => {
+  res.render('index');
+});
+
+// Route for handling form submission
+app.post('/ask', async (req, res) => {
+  const question = req.body.question;
   const answer = await generateResponse({
     prompt: question,
     history: conversationHistory
   });
 
-  console.log(`Mr Intune: ${answer}\n`);
-  
-  conversationHistory.push(`Human: ${question}`, `Mr Intune: ${answer}`)
-}
+  conversationHistory.push(`Human: ${question}`, `Mr Intune: ${answer}`);
+
+  // Pass the conversation history and answer to the view
+  res.render('index', { history: conversationHistory, answer });
+});
+
+const conversationHistory = [];
+
+app.listen(3000, () => {
+  console.log('Server started on port http://localhost:3000');
+});
