@@ -2,14 +2,15 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>OpenAI Chatbot</title>
+  <title>Intune Doc Chatbot</title>
 </head>
 <body>
-  <h1>OpenAI Chatbot</h1>
+  <h1>Intune Doc Chatbot</h1>
   
   <form action="/ask" method="POST">
     <label for="question">Ask a question:</label>
-    <input type="text" id="question" name="question">
+    <input type="text" id="question" name="question" style="width: 500px; height: 50px;">
+    <input type="hidden" name="history" value="<%= JSON.stringify(history) %>" />
     <button type="submit">Ask</button>
   </form>
   
@@ -18,11 +19,6 @@
     <% for (const message of history) { %>
       <li><%= message %></li>
     <% } %>
-  </ul>
-  
-  <% if (answer) { %>
-    <h2>Answer</h2>
-    <p><%= answer %></p>
-  <% } %>
+  </ul>  
 </body>
 </html>

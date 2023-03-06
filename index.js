@@ -1,34 +1,44 @@
-const express = require('express');
-const generateResponse = require('./lib/generateResponse');
-const promptSync = require('prompt-sync')();
+import express from 'express';
+import generateResponse from './lib/generateResponse.js';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
+
+let history = []; // initialize the conversation history
 
 const app = express();
-app.use(express.urlencoded({ extended: true }));
+const port = process.env.PORT || 3000;
 
-// Set EJS as the view engine
+// Set the views directory
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+app.set('views', join(__dirname, 'views'));
+
+// Set the view engine to EJS
 app.set('view engine', 'ejs');
 
-// Route for the homepage
+// Middleware to parse the request body
+app.use(express.urlencoded({ extended: false }));
+
+// Serve static files from the public directory
+app.use(express.static(join(__dirname, 'public')));
+
+// Render the home page
 app.get('/', (req, res) => {
-  res.render('index');
+  res.render('index', { history: [] });
 });
 
-// Route for handling form submission
+// Handle the conversation form submission
 app.post('/ask', async (req, res) => {
+  const conversationHistory = JSON.parse(req.body.history) || [];
   const question = req.body.question;
   const answer = await generateResponse({
     prompt: question,
     history: conversationHistory
   });
-
-  conversationHistory.push(`Human: ${question}`, `Mr Intune: ${answer}`);
-
-  // Pass the conversation history and answer to the view
-  res.render('index', { history: conversationHistory, answer });
+  const newHistory = [...conversationHistory, `Human: ${question}`, `Mr Intune: ${answer}`];
+  res.render('index', { history: newHistory, answer: answer, question: question });
 });
 
-const conversationHistory = [];
-
-app.listen(3000, () => {
-  console.log('Server started on port http://localhost:3000');
+// Start the server
+app.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
 });
